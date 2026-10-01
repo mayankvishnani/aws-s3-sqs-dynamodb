@@ -31,7 +31,7 @@ You already built a reimbursement portal with invoice images, so the S3 part is 
 
 | Day | Focus | Done when |
 |---|---|---|
-| **Day 1** | Setup, local AWS, S3 | You can get a presigned URL, upload a file with `curl`, and see it in the bucket |
+| **Day 1** | Setup, Floci, S3 | You can get a presigned URL, upload a file with `curl`, and see it in the bucket |
 | **Day 2** | DynamoDB | You can create a quote and read it back with a single Query |
 | **Day 3** | SQS and the worker | `POST /quotes` returns instantly, the worker fills in carrier results later |
 | **Day 4** | Failure handling, tests, README, interview prep | You can break the system on purpose and explain what happens |
@@ -50,25 +50,39 @@ If you only have three days, merge Day 4 into the end of Day 3 and skip the stre
 - You normally never make a bucket public. Instead you hand out a **presigned URL**: a temporary link, signed with your credentials, that allows exactly one action (upload or download) on exactly one key for a limited time.
 - Why presigned URLs matter: if the file goes browser → your server → S3, your server pays for the bandwidth and memory. With a presigned URL it goes browser → S3 directly, and your server only signs.
 
-### 2.2 Local AWS with Docker
+### 2.2 Floci local AWS emulator
 
-You already know Docker, so run AWS locally with LocalStack. It pretends to be S3, DynamoDB and SQS on `localhost:4566`, so you pay nothing and cannot break a real account.
+Use Floci for every AWS service in this project. Floci is a local AWS emulator that provides S3, DynamoDB, and SQS at `http://localhost:4566`; this plan does not use a real AWS account.
 
-> **Check first:** LocalStack's licensing and sign-up requirements have changed over time. Look at docs.localstack.cloud before you start. If it needs a free account or token, create one. If you prefer, use a real AWS account with a **budget alert** (see section 8). The code below works for both because of one environment variable.
+Before coding, install and verify:
 
-Create `docker-compose.yml`:
+- Docker Desktop and the AWS CLI.
+- The Floci CLI for Windows: `iwr https://floci.io/install.ps1 | iex` (or install it with Scoop).
+
+Start Floci in PowerShell:
+
+```powershell
+floci doctor
+floci start --services s3,dynamodb,sqs --persist .\floci-data
+floci wait --service dynamodb
+floci env --shell powershell | Invoke-Expression
+```
+
+The `floci env` command sets the local AWS endpoint, region, and throwaway credentials for the current PowerShell session. Repeat it in every new terminal that runs the AWS CLI. If you use Bash instead, run `eval $(floci env)`.
+
+The equivalent Docker Compose setup is:
 
 ```yaml
 services:
-  localstack:
-    image: localstack/localstack   # the LocalStack image
+  floci:
+    image: floci/floci:latest
     ports:
-      - "4566:4566"                # the single port all fake AWS services use
-    environment:
-      - SERVICES=s3,dynamodb,sqs   # start only the three services we need
+      - "4566:4566"
 ```
 
-Run it: `docker compose up -d`
+Run it with `docker compose up -d`, then set the AWS environment variables with `floci env --shell powershell | Invoke-Expression`. Prefer the CLI flow above because it also gives you `floci wait`, `floci doctor`, and persistence options.
+
+**Local-only rule:** do not add a `USE_LOCALSTACK` switch, real AWS credentials, `aws configure`, or a real AWS deployment step to this project. Every SDK and CLI command must target Floci.
 
 ### 2.3 Project setup
 
@@ -116,7 +130,8 @@ Add scripts to `package.json`:
   "setup": "tsx src/setup.ts",
   "api": "tsx src/api.ts",
   "worker": "tsx src/worker.ts",
-  "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
 }
 ```
 
@@ -141,32 +156,25 @@ quotehub/
 ### 2.4 `src/config.ts`
 
 ```ts
-// If USE_LOCALSTACK is not explicitly "false", we talk to the local fake AWS.
-export const isLocal = process.env.USE_LOCALSTACK !== "false";
-
 export const config = {
   region: "us-east-1",
-  // On real AWS bucket names must be globally unique: add your name, e.g. "quotehub-mayank-docs".
   bucket: "quotehub-documents",
   table: "QuoteHub",
   queueName: "quote-requests",
   dlqName: "quote-requests-dlq",
 };
 
-// Settings shared by every AWS client.
-export const awsClientConfig = isLocal
-  ? {
-      region: config.region,
-      endpoint: "http://localhost:4566",            // send requests to LocalStack, not real AWS
-      credentials: { accessKeyId: "test", secretAccessKey: "test" }, // LocalStack accepts any keys
-    }
-  : { region: config.region };                      // on real AWS, credentials come from `aws configure`
+// Settings shared by every AWS client. These credentials and the endpoint are Floci-only.
+export const awsClientConfig = {
+  region: config.region,
+  endpoint: "http://localhost:4566",
+  credentials: { accessKeyId: "test", secretAccessKey: "test" },
+};
 ```
 
 Line by line:
-- Line 1-2: one switch decides local or real AWS, so you never edit code to move between them.
 - `config` holds every resource name in one place. A typo in a name is a common bug, so you never retype them.
-- `endpoint` is what redirects the SDK to your laptop. Remove it and the same code talks to real AWS.
+- `endpoint` redirects every SDK request to Floci on your laptop.
 
 ### 2.5 `src/clients.ts`
 
@@ -177,8 +185,8 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { awsClientConfig, isLocal } from "./config";
 
-// forcePathStyle: LocalStack needs URLs like localhost:4566/bucket instead of bucket.localhost:4566
-export const s3 = new S3Client({ ...awsClientConfig, forcePathStyle: isLocal });
+// forcePathStyle keeps presigned URLs reachable through Floci on localhost.
+export const s3 = new S3Client({ ...awsClientConfig, forcePathStyle: true });
 
 export const sqs = new SQSClient(awsClientConfig);
 
@@ -335,7 +343,7 @@ Notes:
 
 ### 2.9 Day 1 tasks and test
 
-1. Start LocalStack, run `npm run setup`, then write a tiny `src/try-s3.ts` that calls `createUploadUrl("image/png")` and prints the result.
+1. Run `floci status`, confirm `aws --endpoint-url=http://localhost:4566 s3 ls` works, then run `npm run setup`. Write a tiny `src/try-s3.ts` that calls `createUploadUrl("image/png")` and prints the result.
 2. Upload a file with the printed URL:
    ```bash
    curl -X PUT -H "Content-Type: image/png" --upload-file invoice.png "<paste url here>"
@@ -738,9 +746,21 @@ You should see `PENDING`, then `COMPLETED` with two or three carrier results. Ru
 
 ### 5.2 Add tests
 
-- Install `vitest` and write unit tests for the pure parts: the carrier adapters, and the logic that decides `COMPLETED` versus a thrown error.
-- Optional: test the DynamoDB functions against LocalStack.
-- Put `npm run typecheck` and the tests in a GitHub Actions workflow. You recently started learning Actions, so this ties together nicely.
+- Install `vitest` with `npm i -D vitest`, then write unit tests for the pure parts: the carrier adapters, and the logic that decides `COMPLETED` versus a thrown error. Extract that decision into a small pure function if it is still embedded in the worker.
+- Test the DynamoDB functions against Floci. Use a fresh Floci state or unique test resource names so tests do not depend on leftovers from manual runs.
+- Run `npm run typecheck` before starting the API and worker, then run `npm test`.
+- Put `npm run typecheck` and `npm test` in a GitHub Actions workflow under `.github/workflows/ci.yml`; start Floci in the workflow before integration tests and stop it afterward.
+
+### 5.3.1 Missing checks before calling the project done
+
+- **Prerequisites:** document the required Node.js, Docker Desktop, AWS CLI, and Floci CLI versions, then run `floci doctor`.
+- **Readiness:** start Floci and wait for it before `npm run setup`; do not rely on a fixed sleep.
+- **Configuration:** verify the SDK, AWS CLI, and presigned URL all use `http://localhost:4566` and `us-east-1`.
+- **Happy path:** verify upload, quote creation, asynchronous processing, polling, and carrier results.
+- **Failure paths:** verify invalid input returns `400`, a missing quote returns `404`, partial carrier failure still completes, total failure reaches the DLQ, and a worker restart retries the message.
+- **Consistency:** test when DynamoDB succeeds but SQS enqueue fails; decide whether to mark the quote `FAILED` or add a recovery mechanism instead of leaving it `PENDING` forever.
+- **Repeatability:** run setup twice and confirm it is safe; run tests against clean Floci state or isolated names.
+- **Teardown:** stop Floci and remove its persisted `floci-data` directory when a clean reset is needed.
 
 ### 5.3 Write the README (this is part of the deliverable)
 
@@ -755,13 +775,15 @@ Include:
 - Add a **GSI** (global secondary index) so you can list all quotes for one business.
 - Add **retry with exponential backoff** inside each carrier call.
 - Add a **webhook** that your API calls when a quote completes (the job description mentions partner integrations).
-- Deploy to real AWS (see section 8).
+- Try a second Floci instance or a persisted state snapshot only after the core flow works.
 
 ---
 
-## 6. IAM in two minutes (so the interviewer cannot catch you out)
+## 6. IAM in two minutes (interview theory only)
 
 IAM controls who can do what in AWS. The rule is **least privilege**: grant only what is needed. For this app:
+
+This policy is an interview exercise, not a setup step. Do not create an AWS account or apply it to real AWS for this project; Floci uses local throwaway credentials.
 
 ```json
 {
@@ -800,13 +822,20 @@ When you describe the project, speak about what you built and what you learned. 
 
 ---
 
-## 8. Optional: running on real AWS safely
+## 8. Floci reset and cleanup
 
-1. Create an AWS account, set a **billing budget alert** (for example 5 USD) first, and enable MFA on the root user.
-2. Create an IAM user (or use IAM Identity Center) with the policy above, and run `aws configure`.
-3. Set `USE_LOCALSTACK=false`, and change `config.bucket` to a globally unique name.
-4. Run `npm run setup`, then the API and the worker as before.
-5. When finished, **delete everything**: empty and delete the bucket, delete the table, delete both queues. At this scale the cost is tiny, but leftover resources and forgotten keys are how people get surprise bills.
+Use these commands when you need to stop the local environment or reproduce a run from empty state:
+
+```powershell
+floci stop
+Remove-Item -Recurse -Force .\floci-data
+floci start --services s3,dynamodb,sqs --persist .\floci-data
+floci wait --service dynamodb
+floci env --shell powershell | Invoke-Expression
+npm run setup
+```
+
+Do not run `aws configure` and do not point this repository at a real AWS account. The only AWS endpoint for the project is Floci at `http://localhost:4566`.
 
 ---
 
