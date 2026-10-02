@@ -65,10 +65,10 @@ Start Floci in PowerShell:
 floci doctor
 floci start --services s3,dynamodb,sqs --persist .\floci-data
 floci wait --service dynamodb
-floci env --shell powershell | Invoke-Expression
+Invoke-Expression (floci env --shell powershell | Out-String)
 ```
 
-The `floci env` command sets the local AWS endpoint, region, and throwaway credentials for the current PowerShell session. Repeat it in every new terminal that runs the AWS CLI. If you use Bash instead, run `eval $(floci env)`.
+The `floci env` command sets the local AWS endpoint, region, and throwaway credentials for the current PowerShell session. Repeat it in every new terminal that runs the AWS CLI. In PowerShell, use `Invoke-Expression (floci env --shell powershell | Out-String)`; plain `floci env` emits Bash `export` commands and will fail in PowerShell. If you use Bash instead, run `eval $(floci env)`.
 
 The equivalent Docker Compose setup is:
 
@@ -80,7 +80,7 @@ services:
       - "4566:4566"
 ```
 
-Run it with `docker compose up -d`, then set the AWS environment variables with `floci env --shell powershell | Invoke-Expression`. Prefer the CLI flow above because it also gives you `floci wait`, `floci doctor`, and persistence options.
+Run it with `docker compose up -d`, then set the AWS environment variables with `Invoke-Expression (floci env --shell powershell | Out-String)`. Prefer the CLI flow above because it also gives you `floci wait`, `floci doctor`, and persistence options.
 
 **Local-only rule:** do not add a `USE_LOCALSTACK` switch, real AWS credentials, `aws configure`, or a real AWS deployment step to this project. Every SDK and CLI command must target Floci.
 
@@ -109,19 +109,24 @@ Edit `tsconfig.json` so it contains at least:
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["node"],
+    "verbatimModuleSyntax": false
   },
   "include": ["src"]
 }
 ```
 
 - `"strict": true` turns on all of TypeScript's safety checks. This is the whole point of using TypeScript, so never turn it off.
-- `"module": "CommonJS"` keeps imports simple (no `.js` extensions needed).
+- `"module": "Node16"` uses Node's module rules; this package stays CommonJS because `package.json` does not set `"type": "module"`.
+- `"types": ["node"]` makes Node globals and built-in modules available to TypeScript.
+- TypeScript 7 removed the old `"moduleResolution": "node"` setting, so use `"Node16"` here.
 
 Add scripts to `package.json`:
 
@@ -130,8 +135,7 @@ Add scripts to `package.json`:
   "setup": "tsx src/setup.ts",
   "api": "tsx src/api.ts",
   "worker": "tsx src/worker.ts",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+  "typecheck": "tsc --noEmit"
 }
 ```
 
@@ -345,11 +349,11 @@ Notes:
 
 1. Run `floci status`, confirm `aws --endpoint-url=http://localhost:4566 s3 ls` works, then run `npm run setup`. Write a tiny `src/try-s3.ts` that calls `createUploadUrl("image/png")` and prints the result.
 2. Upload a file with the printed URL:
-   ```bash
-   curl -X PUT -H "Content-Type: image/png" --upload-file invoice.png "<paste url here>"
+   ```powershell
+   curl.exe -X PUT -H "Content-Type: image/png" --upload-file "C:\path\to\invoice.png" "<paste url here>"
    ```
 3. Confirm it arrived. With the AWS CLI: `aws --endpoint-url=http://localhost:4566 s3 ls s3://quotehub-documents/uploads/`
-4. Change the Content-Type in the curl command and watch the upload fail. This shows that the signature really restricts the request.
+4. `src/s3.ts` signs the `Content-Type` header. Floci 2.1.0 defaults signature validation off, so a changed header may still return HTTP 200. Enabling `FLOCI_AUTH_VALIDATE_SIGNATURES=true` made our Floci 2.1.0 test reject both matching and mismatched headers with `SignatureDoesNotMatch`; treat this as an emulator limitation unless a newer version accepts the matching type and rejects the changed one.
 
 **Day 1 checkpoint question to answer in your own words:** why do we upload straight to S3 instead of through our API?
 
@@ -746,7 +750,7 @@ You should see `PENDING`, then `COMPLETED` with two or three carrier results. Ru
 
 ### 5.2 Add tests
 
-- Install `vitest` with `npm i -D vitest`, then write unit tests for the pure parts: the carrier adapters, and the logic that decides `COMPLETED` versus a thrown error. Extract that decision into a small pure function if it is still embedded in the worker.
+- Install `vitest` with `npm i -D vitest` and add `"test": "vitest run"` to `package.json`, then write unit tests for the pure parts: the carrier adapters, and the logic that decides `COMPLETED` versus a thrown error. Extract that decision into a small pure function if it is still embedded in the worker.
 - Test the DynamoDB functions against Floci. Use a fresh Floci state or unique test resource names so tests do not depend on leftovers from manual runs.
 - Run `npm run typecheck` before starting the API and worker, then run `npm test`.
 - Put `npm run typecheck` and `npm test` in a GitHub Actions workflow under `.github/workflows/ci.yml`; start Floci in the workflow before integration tests and stop it afterward.
@@ -831,7 +835,7 @@ floci stop
 Remove-Item -Recurse -Force .\floci-data
 floci start --services s3,dynamodb,sqs --persist .\floci-data
 floci wait --service dynamodb
-floci env --shell powershell | Invoke-Expression
+Invoke-Expression (floci env --shell powershell | Out-String)
 npm run setup
 ```
 

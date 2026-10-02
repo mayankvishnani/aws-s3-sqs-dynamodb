@@ -1,0 +1,6 @@
+/node_modules/
+/dist/
+/floci-data/
+.env
+.env.*
+!.env.example
