@@ -1,0 +1,4 @@
+.alert { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 10px 12px; margin-bottom: 16px; border: 1px solid; border-radius: 7px; font-size: 10px; animation: fade-rise .2s ease both; }
+.alert button { display: grid; place-items: center; border: 0; padding: 2px; color: inherit; background: transparent; cursor: pointer; }
+.alert-error { color: #ffaaaa; border-color: #693f46; background: #321e25; }
+.alert-success { color: #a5e8d0; border-color: #35584d; background: #172822; }

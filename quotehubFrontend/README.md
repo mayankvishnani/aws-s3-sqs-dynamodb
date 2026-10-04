@@ -2,6 +2,17 @@
 
 A dark, responsive React dashboard for the QuoteHub quote API.
 
+## Project structure
+
+- `src/App.tsx` composes the application shell and the current page.
+- `src/hooks/useQuoteHub.ts` owns quote state, API workflows, and background polling.
+- `src/api/quoteApi.ts` contains typed API requests and document upload logic.
+- `src/components/layout/` contains the sidebar, top bar, and footer.
+- `src/components/overview/` contains dashboard sections and the quote request form.
+- `src/components/quotes/` contains quote history, details, and the selected-quote modal.
+- `src/components/ui/` contains shared icons, status badges, and alerts.
+- Components keep their stylesheets alongside their TSX files; `src/styles.css` defines shared tokens and app-wide foundations.
+
 ## Run locally
 
 Start Floci and create its S3/DynamoDB/SQS resources as described in the repository's [README](../README.md). Then run the backend API from `quotehub/`:

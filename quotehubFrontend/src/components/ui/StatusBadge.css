@@ -1,0 +1,5 @@
+.status-badge { display: inline-flex; align-items: center; gap: 5px; width: fit-content; padding: 4px 7px; border: 1px solid; border-radius: 5px; text-transform: capitalize; font-size: 8px; line-height: 1; white-space: nowrap; }
+.status-pending { color: #dfb975; border-color: #6b5736; background: #dbad4d0c; }
+.status-processing { color: #aaa0ff; border-color: #514a77; background: #9888ff0d; }
+.status-completed { color: #81d9b7; border-color: #375e50; background: #81d9b70d; }
+.status-failed { color: #f08e8e; border-color: #663c42; background: #ff86860d; }

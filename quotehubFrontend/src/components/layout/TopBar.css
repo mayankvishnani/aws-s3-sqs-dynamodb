@@ -1,0 +1,16 @@
+.topbar { height: 60px; position: sticky; top: 0; z-index: 4; display: flex; align-items: center; justify-content: space-between; padding: 0 46px; background: #0b0d12ef; border-bottom: 1px solid #20232c; backdrop-filter: blur(14px); }
+.breadcrumb, .topbar-right { display: flex; align-items: center; }
+.breadcrumb { gap: 10px; color: #777e8c; font-size: 10px; }
+.breadcrumb strong { color: #d9dce4; font-weight: 500; }
+.topbar-right { gap: 15px; color: #858b97; font-size: 10px; }
+.secure-indicator { display: flex; align-items: center; gap: 7px; }
+.secure-dot { width: 6px; height: 6px; background: #7adbb9; border-radius: 50%; box-shadow: 0 0 10px #7adbb988; }
+.topbar-divider { width: 1px; height: 17px; background: #2c3039; }
+.top-avatar { width: 27px; height: 27px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 50%; color: #d3caff; background: #413b61; font: 700 10px "Manrope",sans-serif; }
+
+@media (max-width: 1150px) { .topbar { padding-right: 28px; padding-left: 28px; } }
+@media (max-width: 650px) {
+  .topbar { height: 52px; padding: 0 15px; }
+  .topbar-right { gap: 9px; }
+  .date-label, .topbar-divider { display: none; }
+}

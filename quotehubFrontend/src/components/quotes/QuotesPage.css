@@ -1,0 +1,35 @@
+.quotes-title-row { display: flex; align-items: end; justify-content: space-between; margin: 9px 0 20px; }
+.quotes-title-row h1 { margin: 8px 0 5px; color: #f2f3f7; font: 700 33px/1.18 "Manrope",sans-serif; letter-spacing: -1.65px; }
+.quotes-title-row p { margin: 0; color: #8c929f; font-size: 11px; }
+.title-period { color: var(--mint); }
+.search-form { display: flex; align-items: center; gap: 10px; max-width: 510px; height: 40px; padding: 0 6px 0 12px; margin-bottom: 16px; color: #7a818e; background: #11141b; border: 1px solid #292d38; border-radius: 7px; }
+.search-form:focus-within { border-color: #6caa94; }
+.search-form input { flex: 1; min-width: 0; border: 0; outline: 0; color: #e7e9ef; background: transparent; font-size: 10px; }
+.search-form input::placeholder { color: #707785; }
+.search-form button { height: 28px; display: flex; align-items: center; gap: 7px; padding: 0 9px; border: 0; border-radius: 5px; color: #121714; background: var(--mint); cursor: pointer; font-size: 9px; font-weight: 700; }
+.all-quotes-panel { min-height: 300px; padding: 16px 17px; }
+.list-heading { display: flex; align-items: end; justify-content: space-between; padding-bottom: 13px; border-bottom: 1px solid #252934; }
+.list-heading h2 { margin: 5px 0 0; color: #e9ebf1; font: 600 14px "Manrope",sans-serif; }
+.list-heading h2 span { padding: 2px 6px; margin-left: 4px; color: #a5aab5; background: #272b35; border-radius: 4px; font: 500 8px "DM Sans",sans-serif; vertical-align: 2px; }
+.auto-refresh { display: flex; align-items: center; gap: 6px; color: #8b929f; font-size: 8px; }
+.auto-refresh > span { width: 5px; height: 5px; background: #7adbb9; border-radius: 50%; box-shadow: 0 0 10px #7adbb988; }
+.quote-row { width: 100%; display: flex; align-items: center; gap: 11px; padding: 12px 4px; border: 0; border-bottom: 1px solid #222630; color: inherit; background: transparent; cursor: pointer; text-align: left; transition: background .16s ease; }
+.quote-row:hover { background: #171b23; }
+.quote-main { min-width: 0; flex: 1; }
+.quote-main b { display: block; overflow: hidden; color: #d7dae2; font-size: 10px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.quote-main small { display: block; overflow: hidden; margin-top: 4px; color: #7f8693; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+.quote-main small span { padding: 0 3px; color: #535966; }
+.quote-date { min-width: 47px; color: #777e8b; font-size: 8px; text-align: right; }
+.quote-row > svg { color: #717784; }
+.quotes-loading { min-height: 190px; display: flex; align-items: center; justify-content: center; gap: 9px; color: #9096a2; font-size: 10px; }
+.empty-state { display: flex; flex-direction: column; align-items: center; padding: 42px 20px; text-align: center; }
+.empty-state h3 { margin: 12px 0 4px; color: #e7e9ef; font: 600 13px "Manrope",sans-serif; }
+.empty-state p { max-width: 250px; margin-bottom: 15px; color: #838a97; font-size: 9px; line-height: 1.6; }
+.empty-state .button-primary { min-height: 31px; font-size: 9px; }
+.business-avatar { width: 29px; height: 29px; flex: 0 0 auto; display: grid; place-items: center; color: #c2baff; border: 1px solid #4c4764; border-radius: 8px; background: #a79cff14; font: 600 11px "Manrope",sans-serif; }
+@media (max-width: 650px) {
+  .quotes-title-row h1 { font-size: 29px; }
+  .quote-row { gap: 8px; }
+  .quote-date { display: none; }
+  .quote-row .status-badge { padding: 4px 5px; font-size: 7px; }
+}

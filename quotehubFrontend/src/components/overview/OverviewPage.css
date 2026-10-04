@@ -1,0 +1,22 @@
+.work-grid { display: grid; grid-template-columns: minmax(0,1.75fr) minmax(220px,.9fr); gap: 14px; align-items: start; margin-top: 16px; animation: fade-rise .55s .13s ease both; }
+.side-column { display: grid; gap: 12px; }
+.how-panel { padding: 17px 16px 15px; }
+.mini-panel-title { display: flex; align-items: center; justify-content: space-between; }
+.mini-title-icon { width: 25px; height: 25px; display: grid; place-items: center; color: #b3a7ff; background: #a99cff15; border-radius: 6px; }
+.how-panel h3 { margin: 11px 0 15px; color: #e6e8ef; font: 600 16px/1.45 "Manrope",sans-serif; letter-spacing: -.4px; }
+.process-step { display: flex; align-items: center; gap: 10px; }
+.process-number { width: 27px; height: 27px; flex: 0 0 auto; display: grid; place-items: center; color: #a99eff; border: 1px solid #4b4563; border-radius: 8px; background: #9a8dff0a; font: 600 9px "Manrope",sans-serif; }
+.process-step b, .process-step small { display: block; }
+.process-step b { color: #c8cbd4; font-size: 9px; font-weight: 600; }
+.process-step small { margin-top: 3px; color: #7b8290; font-size: 8px; }
+.process-line { height: 12px; margin: 2px 0 2px 13px; border-left: 1px dashed #383544; }
+.trust-card { position: relative; display: flex; gap: 10px; overflow: hidden; padding: 13px 12px; background: linear-gradient(115deg,#15201e,#13191a); border: 1px solid #283630; border-radius: 8px; }
+.trust-icon { width: 29px; height: 29px; flex: 0 0 auto; display: grid; place-items: center; color: #8bd9ba; background: #8bd9ba12; border-radius: 7px; }
+.trust-card > div { position: relative; z-index: 1; }
+.trust-card b { color: #cbdad4; font-size: 9px; }
+.trust-card p { max-width: 185px; margin: 4px 0 0; color: #84938c; font-size: 8px; line-height: 1.5; }
+.trust-watermark { position: absolute; right: -13px; bottom: -36px; color: #8bd9ba08; }
+
+@media (max-width: 1150px) { .work-grid { grid-template-columns: minmax(0,1.5fr) minmax(205px,.8fr); } }
+@media (max-width: 900px) { .work-grid { grid-template-columns: minmax(0,1fr); } .side-column { grid-template-columns: 1fr 1fr; } .how-panel h3 br { display: none; } .trust-card { align-items: flex-start; } }
+@media (max-width: 650px) { .work-grid { gap: 10px; margin-top: 10px; } .side-column { grid-template-columns: 1fr; } .how-panel { padding: 15px; } .trust-card p { max-width: 270px; } }

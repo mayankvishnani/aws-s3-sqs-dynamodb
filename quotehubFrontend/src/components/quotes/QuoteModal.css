@@ -1,0 +1,13 @@
+.modal-backdrop { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; overflow-y: auto; padding: 24px; background: #05060bcc; backdrop-filter: blur(7px); animation: fade-in .18s ease both; }
+.quote-modal { width: min(100%, 510px); max-height: min(90vh, 780px); overflow-y: auto; padding: 17px; border: 1px solid #363b47; border-radius: 12px; background: #0f1219; box-shadow: 0 25px 90px #0009; animation: modal-in .22s ease both; }
+.modal-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 1px 1px 14px; }
+.modal-heading h2 { margin: 5px 0 0; color: #e7e9ef; font: 600 16px "Manrope",sans-serif; letter-spacing: -.3px; }
+.modal-close { width: 31px; height: 31px; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid #303540; border-radius: 7px; color: #a8aeba; background: #171b24; cursor: pointer; transition: .18s ease; }
+.modal-close:hover { color: #fff; border-color: #5e6675; background: #222733; }
+.quote-modal .details-panel { background: #12161e; }
+.details-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 13px; }
+.details-meta > span { display: grid; gap: 5px; padding: 9px; border: 1px solid #282c37; border-radius: 5px; background: #0e1117; }
+.details-meta small { color: #747b89; font-size: 7px; letter-spacing: .8px; }
+.details-meta b { color: #cdd1db; font-size: 10px; font-weight: 600; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modal-in { from { opacity: 0; transform: translateY(9px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
