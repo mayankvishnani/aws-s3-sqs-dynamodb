@@ -1,4 +1,4 @@
-import { PutCommand, QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb'
+import { PutCommand, QueryCommand, ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { ddb } from './clients'
 import { config } from './config'
 import { CarrierQuote, QuoteInput, QuoteStatus } from './types'
@@ -73,4 +73,22 @@ export async function getQuoteItems(quoteId: string): Promise<Record<string, any
     );
 
     return out.Items ?? []
+}
+
+export async function getAllQuoteItems(): Promise<Record<string, any>[]> {
+    const items: Record<string, any>[] = [];
+    let lastEvaluatedKey: Record<string, any> | undefined;
+
+    do {
+        const out = await ddb.send(
+            new ScanCommand({
+                TableName: config.table,
+                ExclusiveStartKey: lastEvaluatedKey,
+            }),
+        );
+        items.push(...(out.Items ?? []));
+        lastEvaluatedKey = out.LastEvaluatedKey;
+    } while (lastEvaluatedKey);
+
+    return items;
 }

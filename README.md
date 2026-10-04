@@ -86,6 +86,18 @@ npm run worker
 
 The API listens at `http://localhost:3000`.
 
+## Run the frontend
+
+Start the API and worker as described above, then open a third PowerShell terminal:
+
+```powershell
+Set-Location .\quotehubFrontend
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`. The React dashboard proxies API calls to `localhost:3000` and document uploads to Floci on `localhost:4566`. See [quotehubFrontend/README.md](quotehubFrontend/README.md) for frontend API coverage and deployment notes.
+
 ## API walkthrough
 
 ### 1. Create a quote
@@ -126,7 +138,15 @@ curl.exe -i "http://localhost:3000/quotes/$quoteId"
 
 Repeat the request to observe the status and carrier results. A quote with at least one successful carrier response is marked `COMPLETED`; individual carrier failures are logged while successful results can still be returned.
 
-### 3. Optional document upload
+### 3. List all quotes
+
+```powershell
+curl.exe -i "http://localhost:3000/allQuotes"
+```
+
+The endpoint returns `{ "quotes": [...] }` with each quote's business input, status, and carrier results. The React frontend uses it to populate the full quote history and opens a detail modal when a quote is selected.
+
+### 4. Optional document upload
 
 Request an upload URL:
 

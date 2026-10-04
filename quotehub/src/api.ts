@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import express from "express";
-import { input, z } from "zod";
-import { createQuote, getQuoteItems } from "./db";
+import { z } from "zod";
+import { createQuote, getAllQuoteItems, getQuoteItems } from "./db";
 import { enqueueQuote } from "./queue";
 import { createDownloadUrl, createUploadUrl } from "./s3";
 
@@ -36,6 +36,39 @@ app.post("/quotes", async (req, res) => {
     await enqueueQuote({ quoteId });
     res.status(202).json({ quoteId, status: "PENDING" });
 })
+
+app.get("/allQuotes", async (_req, res) => {
+    const items = await getAllQuoteItems();
+    const itemsByQuote = new Map<string, Record<string, any>[]>();
+
+    for (const item of items) {
+        if (typeof item.pk !== "string" || !item.pk.startsWith("QUOTE#")) continue;
+        const quoteItems = itemsByQuote.get(item.pk) ?? [];
+        quoteItems.push(item);
+        itemsByQuote.set(item.pk, quoteItems);
+    }
+
+    const quotes = [];
+    for (const [partitionKey, quoteItems] of itemsByQuote) {
+        const meta = quoteItems.find((item) => item.sk === "META");
+        if (!meta) continue;
+
+        quotes.push({
+            quoteId: partitionKey.slice("QUOTE#".length),
+            status: meta.status,
+            input: meta.input,
+            documentKey: meta.documentKey,
+            createdAt: meta.createdAt,
+            updatedAt: meta.updatedAt,
+            results: quoteItems
+                .filter((item) => typeof item.sk === "string" && item.sk.startsWith("RESULT#"))
+                .map(({ pk: _pk, sk: _sk, ...result }) => result),
+        });
+    }
+
+    quotes.sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+    res.json({ quotes });
+});
 
 app.get("/quotes/:id", async (req, res) => {
     const items = await getQuoteItems(req.params.id);
