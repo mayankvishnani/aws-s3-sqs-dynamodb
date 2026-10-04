@@ -22,21 +22,44 @@ QuoteHub is a TypeScript/Node.js learning project that demonstrates an asynchron
 
 ## Project layout
 
-The Node application is in `quotehub/`.
+The repository separates the user interface from the backend:
+
+```text
+aws/
+  README.md
+  quotehub/          # Node.js API, worker, and AWS integrations
+  quotehubFrontend/  # React/Vite web application
+```
+
+The backend is further organized by responsibility:
 
 ```text
 quotehub/
   src/
-    api.ts       # HTTP endpoints
-    carriers.ts  # Mock carrier adapters
-    clients.ts   # S3, DynamoDB, and SQS clients
-    config.ts    # Local endpoint and resource names
-    db.ts        # DynamoDB operations
-    queue.ts     # SQS send, receive, and delete operations
-    s3.ts        # Presigned upload/download URLs
-    setup.ts     # Creates the local bucket, table, and queues
-    types.ts     # Shared TypeScript types
-    worker.ts    # Background quote processor
+    api/
+      server.ts  # Express routes and API server
+    config/
+      index.ts   # Local endpoint and AWS resource names
+    infrastructure/
+      aws/
+        clients.ts
+        dynamodb/
+          quote-repository.ts
+        s3/
+          document-storage.ts
+        sqs/
+          quote-queue.ts
+        setup.ts # Creates local AWS resources
+    scripts/
+      try-db.ts
+      try-s3.ts
+    services/
+      carriers/
+        mock-carriers.ts
+    shared/
+      types.ts
+    workers/
+      quote-worker.ts
 ```
 
 ## Prerequisites
@@ -180,7 +203,7 @@ Include `$upload.key` as `documentKey` when creating a quote. The quote response
 - The setup configures the main queue to send repeatedly failing messages to the DLQ after three receives.
 - Successful carrier results are written under stable quote/carrier keys, making repeated writes idempotent.
 - If every carrier fails, the worker throws so SQS can retry. The current worker does not consume DLQ messages or update the quote to `FAILED`, so a quote may remain `PROCESSING` after the message reaches the DLQ.
-- Carrier failure rates in `src/carriers.ts` are mock settings and can be adjusted temporarily to exercise retry behavior.
+- Carrier failure rates in `src/services/carriers/mock-carriers.ts` are mock settings and can be adjusted temporarily to exercise retry behavior.
 
 ## Useful commands
 
@@ -191,8 +214,8 @@ npm run setup       # create local AWS resources
 npm run typecheck   # check TypeScript
 npm run api         # start HTTP API
 npm run worker      # start background worker
-npx tsx src/try-db.ts
-npx tsx src/try-s3.ts
+npx tsx src/scripts/try-db.ts
+npx tsx src/scripts/try-s3.ts
 ```
 
 The `try-db` and `try-s3` scripts are standalone learning checks; the API/worker flow requires the local AWS resources and both processes to be running.

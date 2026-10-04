@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { createQuote, getQuoteItems, saveCarrierResult, setStatus } from "./db";
-import type { CarrierQuote, QuoteInput } from "./types";
+import { createQuote, getQuoteItems, saveCarrierResult, setStatus } from "../infrastructure/aws/dynamodb/quote-repository";
+import type { CarrierQuote, QuoteInput } from "../shared/types";
 
 async function main(): Promise<void> {
   const quoteId = randomUUID();

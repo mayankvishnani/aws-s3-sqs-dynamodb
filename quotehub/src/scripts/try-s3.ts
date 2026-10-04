@@ -1,4 +1,4 @@
-import { createUploadUrl } from "./s3";
+import { createUploadUrl } from "../infrastructure/aws/s3/document-storage";
 
 async function main(): Promise<void> {
   const upload = await createUploadUrl("image/png");

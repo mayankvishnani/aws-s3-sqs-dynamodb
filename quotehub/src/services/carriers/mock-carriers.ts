@@ -1,4 +1,4 @@
-import type { CarrierQuote, QuoteInput } from "./types";
+import type { CarrierQuote, QuoteInput } from "../../shared/types";
 
 export interface Carrier {
     name: string;

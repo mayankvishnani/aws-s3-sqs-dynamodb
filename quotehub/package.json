@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "setup": "tsx src/setup.ts",
-    "api": "tsx src/api.ts",
-    "worker": "tsx src/worker.ts",
+    "setup": "tsx src/infrastructure/aws/setup.ts",
+    "api": "tsx src/api/server.ts",
+    "worker": "tsx src/workers/quote-worker.ts",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],

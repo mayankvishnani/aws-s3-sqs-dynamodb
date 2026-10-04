@@ -1,7 +1,7 @@
 import { PutCommand, QueryCommand, ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb'
-import { ddb } from './clients'
-import { config } from './config'
-import { CarrierQuote, QuoteInput, QuoteStatus } from './types'
+import { ddb } from '../clients'
+import { config } from '../../../config'
+import { CarrierQuote, QuoteInput, QuoteStatus } from '../../../shared/types'
 
 const pk = (quoteId: string) => `QUOTE#${quoteId}`;
 

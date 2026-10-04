@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 import express from "express";
 import { z } from "zod";
-import { createQuote, getAllQuoteItems, getQuoteItems } from "./db";
-import { enqueueQuote } from "./queue";
-import { createDownloadUrl, createUploadUrl } from "./s3";
+import { createQuote, getAllQuoteItems, getQuoteItems } from "../infrastructure/aws/dynamodb/quote-repository";
+import { enqueueQuote } from "../infrastructure/aws/sqs/quote-queue";
+import { createDownloadUrl, createUploadUrl } from "../infrastructure/aws/s3/document-storage";
 
 const app = express();
 app.use(express.json());

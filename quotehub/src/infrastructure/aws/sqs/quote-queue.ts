@@ -1,7 +1,7 @@
 import{ DeleteMessageCommand, GetQueueUrlCommand, ReceiveMessageCommand, SendMessageCommand, type Message } from "@aws-sdk/client-sqs";
-import { sqs } from "./clients";
-import { config } from "./config";
-import type { QuoteMessage } from "./types";
+import { sqs } from "../clients";
+import { config } from "../../../config";
+import type { QuoteMessage } from "../../../shared/types";
 
 let cachedUrl: string | undefined;
 

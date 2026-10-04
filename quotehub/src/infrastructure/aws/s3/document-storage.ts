@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { s3 } from "./clients";
-import { config } from "./config";
+import { s3 } from "../clients";
+import { config } from "../../../config";
 
 export async function createUploadUrl(
   contentType: string,

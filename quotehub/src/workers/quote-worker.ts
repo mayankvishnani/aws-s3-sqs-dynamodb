@@ -1,8 +1,8 @@
 import type { Message } from "@aws-sdk/client-sqs";
-import { carriers } from "./carriers";
-import { getQuoteItems, saveCarrierResult, setStatus } from "./db";
-import { deleteMessage, receiveMessages } from "./queue";
-import type { CarrierQuote, QuoteInput, QuoteMessage } from "./types";
+import { carriers } from "../services/carriers/mock-carriers";
+import { getQuoteItems, saveCarrierResult, setStatus } from "../infrastructure/aws/dynamodb/quote-repository";
+import { deleteMessage, receiveMessages } from "../infrastructure/aws/sqs/quote-queue";
+import type { CarrierQuote, QuoteInput, QuoteMessage } from "../shared/types";
 
 async  function handle(message: Message): Promise<void> {
     const { quoteId } = JSON.parse(message.Body ?? "{}") as QuoteMessage;

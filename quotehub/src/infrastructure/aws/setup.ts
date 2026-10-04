@@ -5,7 +5,7 @@ import {
   GetQueueAttributesCommand,
 } from "@aws-sdk/client-sqs";
 import { rawDdb, s3, sqs } from "./clients";
-import { config } from "./config";
+import { config } from "../../config";
 
 async function safely(label: string, fn: () => Promise<unknown>): Promise<void> {
   try {
