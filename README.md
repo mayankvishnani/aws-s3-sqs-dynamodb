@@ -18,7 +18,7 @@ QuoteHub is a TypeScript/Node.js learning project that demonstrates an asynchron
 - **DynamoDB single-table layout:** `QUOTE#<id>` is the partition key; `META` stores the quote and `RESULT#<carrier>` stores each carrier result. One Query returns the quote and its results.
 - **SQS standard queue:** separates API acceptance from background processing. Standard queues may deliver a message more than once, so carrier results use stable keys and can be overwritten safely.
 - **Dead-letter queue:** receives messages after repeated processing failures according to the queue redrive policy.
-- **Mock carrier adapters:** share a common interface, simulate latency, and can simulate failures.
+- **Carrier adapters:** share a common interface but have carrier-specific latency, quote values, timeouts, and retry policies. The current adapters are mocks; their differences demonstrate how independently integrated carrier APIs can fit the same worker.
 
 ## Project layout
 
@@ -198,12 +198,23 @@ Include `$upload.key` as `documentKey` when creating a quote. The quote response
 
 ## Failure and delivery behavior
 
+- Each carrier request has its own deadline, maximum attempt count, and exponential-backoff delay. Retryable carrier errors and timeouts are retried independently; a non-retryable error stops attempts for that carrier. Carrier attempts run concurrently, so a slow carrier does not block successful carrier results beyond its own configured timeout and retries.
+- `maxAttempts` includes the initial request. After a retryable failure, the wait is `retryDelayMs * 2^(attempt - 1)`, so the configured retry delay grows exponentially.
+
+| Mock carrier | Timeout | Maximum attempts | Initial retry delay | Mock profile |
+|---|---:|---:|---:|---|
+| Acme Mutual | 700 ms | 2 | 100 ms | Fast, relatively reliable; $1M coverage |
+| Globex Corporation | 650 ms | 3 | 150 ms | Higher transient/permanent failure rates; $750K coverage |
+| Initech Speciality | 900 ms | 2 | 200 ms | Slower response and larger coverage; $1.5M coverage |
+
+- Carrier adapters receive an `AbortSignal`. Real HTTP adapters should pass it to `fetch` (or the HTTP client's equivalent) and map transient network/service errors to `CarrierRequestError` with `retryable: true`; permanent validation or business-rule errors should be non-retryable. The request wrapper still enforces its deadline if an adapter ignores cancellation, but ignoring the signal can leave its underlying operation running.
+- The carrier timeout/retry policy is separate from SQS redelivery: per-carrier retries happen inside one worker attempt, while SQS redelivers the whole quote message only when processing fails (for example, when every carrier fails).
 - SQS standard queues provide at-least-once delivery. A worker may receive the same message again.
 - The worker deletes a message only after processing succeeds. Processing failures are logged and leave the message available for retry.
 - The setup configures the main queue to send repeatedly failing messages to the DLQ after three receives.
 - Successful carrier results are written under stable quote/carrier keys, making repeated writes idempotent.
 - If every carrier fails, the worker throws so SQS can retry. The current worker does not consume DLQ messages or update the quote to `FAILED`, so a quote may remain `PROCESSING` after the message reaches the DLQ.
-- Carrier failure rates in `src/services/carriers/mock-carriers.ts` are mock settings and can be adjusted temporarily to exercise retry behavior.
+- Carrier behavior and policy values in `quotehub/src/services/carriers/mock-carriers.ts` are mock settings. Adjust latency, failure rates, timeout, or attempts there to exercise the different outcomes; a permanent mock failure is not retried.
 
 ## Useful commands
 
