@@ -222,7 +222,7 @@ The `try-db` and `try-s3` scripts are standalone learning checks; the API/worker
 
 ## GitHub Actions learning path
 
-The starter workflow at `.github/workflows/ci.yml` runs backend type-checking and tests, plus a frontend production build. It runs for pushes, pull requests, and manual runs; these checks do not need AWS credentials or a running Floci instance.
+The starter workflow at `.github/workflows/ci.yml` runs backend type-checking and tests when a backend test script is configured, plus a frontend production build. If no backend test script exists yet, the workflow reports a notice and skips that step. It runs for pushes, pull requests, and manual runs; these checks do not need AWS credentials or a running Floci instance.
 
 Try these exercises in order:
 

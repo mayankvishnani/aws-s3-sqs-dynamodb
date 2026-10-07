@@ -33,7 +33,12 @@ jobs:
         run: npm run typecheck
 
       - name: Run backend tests
-        run: npm test
+        run: |
+          if node -e "process.exit(require('./package.json').scripts?.test ? 0 : 1)"; then
+            npm test
+          else
+            echo "::notice::No backend test script is configured; skipping tests until one is added."
+          fi
 
   frontend:
     name: Frontend build
