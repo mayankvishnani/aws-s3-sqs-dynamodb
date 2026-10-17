@@ -5,6 +5,10 @@
 .modal-close { width: 31px; height: 31px; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid #303540; border-radius: 7px; color: #a8aeba; background: #171b24; cursor: pointer; transition: .18s ease; }
 .modal-close:hover { color: #fff; border-color: #5e6675; background: #222733; }
 .quote-modal .details-panel { background: #12161e; }
+.quote-modal-editing { width: min(100%, 650px); }
+.quote-modal-editing .quote-panel { padding: 15px; }
+.quote-modal-editing .quote-panel > .panel-heading { display: none; }
+.quote-modal-editing .form-footer { flex-wrap: wrap; }
 .details-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 13px; }
 .details-meta > span { display: grid; gap: 5px; padding: 9px; border: 1px solid #282c37; border-radius: 5px; background: #0e1117; }
 .details-meta small { color: #747b89; font-size: 7px; letter-spacing: .8px; }

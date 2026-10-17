@@ -56,6 +56,7 @@ export async function submitQuote(input: QuoteInput, file?: File): Promise<Quote
     if (!uploaded.ok) {
       throw new Error(`Document upload failed (${uploaded.status}). Check the Floci S3 service and try again.`);
     }
+
     documentKey = upload.key;
   }
 
@@ -72,4 +73,12 @@ export async function submitQuote(input: QuoteInput, file?: File): Promise<Quote
     createdAt: new Date().toISOString(),
     results: [],
   };
+}
+
+export async function updateQuote(quoteId: string, input: QuoteInput): Promise<Quote> {
+  return request<Quote>(`/quotes/${encodeURIComponent(quoteId)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
 }

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import express from "express";
 import { z } from "zod";
-import { createQuote, getAllQuoteItems, getQuoteItems } from "../infrastructure/aws/dynamodb/quote-repository";
+import { createQuote, getAllQuoteItems, getQuoteItems, updateQuoteInput } from "../infrastructure/aws/dynamodb/quote-repository";
 import { enqueueQuote } from "../infrastructure/aws/sqs/quote-queue";
 import { createDownloadUrl, createUploadUrl } from "../infrastructure/aws/s3/document-storage";
 
@@ -9,11 +9,13 @@ const app = express();
 app.use(express.json());
 
 const uploadSchema = z.object({ contentType: z.string().min(1) });
-const quoteSchema = z.object({ 
+const quoteInputSchema = z.object({
     businessName: z.string().min(1),
     industry: z.string().min(1),
     annualRevenue: z.number().positive(),
     state: z.string().length(2),
+});
+const quoteSchema = quoteInputSchema.extend({
     documentKey: z.string().optional(),
 });
 
@@ -36,6 +38,28 @@ app.post("/quotes", async (req, res) => {
     await enqueueQuote({ quoteId });
     res.status(202).json({ quoteId, status: "PENDING" });
 })
+
+app.patch("/quotes/:id", async (req, res) => {
+    const parsed = quoteInputSchema.safeParse(req.body);
+    if (!parsed.success) {
+        return res.status(400).json({ errors: parsed.error.issues });
+    }
+    const updateResult = await updateQuoteInput(req.params.id, parsed.data);
+    if (updateResult.status === "not-found") {
+        return res.status(404).json({ error: "quote not found" });
+    }
+    if (updateResult.status === "not-editable") {
+        return res.status(409).json({ error: "only completed or failed quotes can be edited" });
+    }
+    await enqueueQuote({ quoteId: req.params.id });
+    res.status(202).json({
+        quoteId: req.params.id,
+        status: "PENDING",
+        input: parsed.data,
+        updatedAt: updateResult.updatedAt,
+        results: [],
+    });
+});
 
 app.get("/allQuotes", async (_req, res) => {
     const items = await getAllQuoteItems();

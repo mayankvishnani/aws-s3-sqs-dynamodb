@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { fetchAllQuotes, fetchQuote, submitQuote } from "../api/quoteApi";
+import { fetchAllQuotes, fetchQuote, submitQuote, updateQuote as updateQuoteRequest } from "../api/quoteApi";
 import type { Quote, QuoteInput, QuoteStats, QuoteSummary, QuoteView } from "../types/quote";
 import { readSavedQuotes, saveRecentQuotes } from "../utils/quoteFormat";
 
@@ -10,6 +10,7 @@ export function useQuoteHub() {
   const [allQuotesLoading, setAllQuotesLoading] = useState(false);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(false);
+  const [updatingQuote, setUpdatingQuote] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -120,6 +121,34 @@ export function useQuoteHub() {
     }
   }, [updateQuote, upsertQuoteSummary]);
 
+  const editQuote = useCallback(async (quoteId: string, input: QuoteInput) => {
+    setUpdatingQuote(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await updateQuoteRequest(quoteId, input);
+      const existing = allQuotes.find((quote) => quote.quoteId === quoteId) ??
+        (selectedQuote?.quoteId === quoteId ? selectedQuote : undefined);
+      const updated = { ...existing, ...response, input, results: [] };
+      setSelectedQuote(updated);
+      setAllQuotes((current) => current.map((quote) => quote.quoteId === quoteId ? { ...quote, ...updated } : quote));
+      upsertQuoteSummary({
+        quoteId,
+        status: updated.status,
+        businessName: input.businessName,
+        industry: input.industry,
+        createdAt: updated.createdAt ? Date.parse(updated.createdAt) : Date.now(),
+      });
+      setNotice("Quote updated. Fresh carrier options are being generated.");
+      return true;
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not update this quote.");
+      return false;
+    } finally {
+      setUpdatingQuote(false);
+    }
+  }, [allQuotes, selectedQuote, upsertQuoteSummary]);
+
   const findQuote = useCallback(async (quoteId: string) => {
     setError("");
     setNotice("");
@@ -169,6 +198,8 @@ export function useQuoteHub() {
     selectedSummary,
     stats,
     createQuote,
+    editQuote,
+    updatingQuote,
     dismissMessage: () => { setError(""); setNotice(""); },
     findQuote,
     loadAllQuotes,

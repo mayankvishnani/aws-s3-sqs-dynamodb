@@ -3,17 +3,24 @@ import type { QuoteInput } from "../../types/quote";
 import { Icon } from "../ui/Icon";
 import "./QuoteForm.css";
 
+const industries = ["Agriculture", "Construction", "Consulting", "Education", "Food & beverage", "Healthcare", "Manufacturing", "Professional services", "Retail", "Technology", "Transportation", "Other"];
+
 export function QuoteForm({
   loading,
   onSubmit,
+  initialInput,
+  onCancel,
 }: {
   loading: boolean;
   onSubmit: (input: QuoteInput, file?: File) => Promise<boolean>;
+  initialInput?: QuoteInput;
+  onCancel?: () => void;
 }) {
-  const [businessName, setBusinessName] = useState("");
-  const [industry, setIndustry] = useState("");
-  const [annualRevenue, setAnnualRevenue] = useState("");
-  const [state, setState] = useState("");
+  const editing = Boolean(initialInput);
+  const [businessName, setBusinessName] = useState(initialInput?.businessName ?? "");
+  const [industry, setIndustry] = useState(initialInput?.industry ?? "");
+  const [annualRevenue, setAnnualRevenue] = useState(initialInput ? String(initialInput.annualRevenue) : "");
+  const [state, setState] = useState(initialInput?.state ?? "");
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -26,6 +33,10 @@ export function QuoteForm({
       state: state.trim().toUpperCase(),
     }, file ?? undefined);
     if (!submitted) return;
+    if (editing) {
+      onCancel?.();
+      return;
+    }
     setBusinessName("");
     setIndustry("");
     setAnnualRevenue("");
@@ -41,8 +52,8 @@ export function QuoteForm({
   return (
     <div className="panel quote-panel" id="quote-form">
       <div className="panel-heading">
-        <div><span className="section-kicker">LET’S GET STARTED</span><h2>Tell us about your business</h2><p>A few details help us find the right fit.</p></div>
-        <span className="step-pill">STEP <b>01</b> / 01</span>
+        <div><span className="section-kicker">{editing ? "UPDATE REQUEST" : "LET’S GET STARTED"}</span><h2>{editing ? "Edit quote details" : "Tell us about your business"}</h2><p>{editing ? "Saving will request fresh carrier options using these details." : "A few details help us find the right fit."}</p></div>
+        {!editing && <span className="step-pill">STEP <b>01</b> / 01</span>}
       </div>
       <form onSubmit={submit}>
         <div className="form-grid">
@@ -54,7 +65,8 @@ export function QuoteForm({
             <span>Industry <i>*</i></span>
             <select required value={industry} onChange={(event) => setIndustry(event.target.value)}>
               <option value="" disabled>Select your industry</option>
-              {["Agriculture", "Construction", "Consulting", "Education", "Food & beverage", "Healthcare", "Manufacturing", "Professional services", "Retail", "Technology", "Transportation", "Other"].map((item) => <option key={item} value={item.toLowerCase()}>{item}</option>)}
+              {initialInput && !industries.some((item) => item.toLowerCase() === initialInput.industry) && <option value={initialInput.industry}>{initialInput.industry}</option>}
+              {industries.map((item) => <option key={item} value={item.toLowerCase()}>{item}</option>)}
             </select>
           </label>
           <label className="field">
@@ -65,7 +77,7 @@ export function QuoteForm({
             <span>State <i>*</i></span>
             <input required minLength={2} maxLength={2} pattern="[A-Za-z]{2}" value={state} onChange={(event) => setState(event.target.value.toUpperCase())} placeholder="NY" />
           </label>
-          <div className="field field-wide">
+          {!editing && <div className="field field-wide">
             <span>Supporting document <small className="optional">OPTIONAL</small></span>
             <button
               type="button"
@@ -79,13 +91,16 @@ export function QuoteForm({
               {file && <span className="remove-file" onClick={(event) => { event.stopPropagation(); selectFile(); if (fileInputRef.current) fileInputRef.current.value = ""; }} aria-label="Remove file"><Icon name="close" size={15} /></span>}
             </button>
             <input ref={fileInputRef} className="visually-hidden" type="file" onChange={(event) => selectFile(event.target.files?.[0])} />
-          </div>
+          </div>}
         </div>
         <div className="form-footer">
-          <span className="privacy-note"><Icon name="shield" size={14} /> Your information stays private and secure.</span>
-          <button className="button-primary submit-button" type="submit" disabled={loading}>
-            {loading ? <><span className="spinner" /> Sending request</> : <>Compare my options <Icon name="arrow" size={15} /></>}
-          </button>
+          <span className="privacy-note"><Icon name="shield" size={14} /> {editing ? "Your attached document will be kept." : "Your information stays private and secure."}</span>
+          <div className="form-actions">
+            {onCancel && <button className="button-secondary" type="button" onClick={onCancel} disabled={loading}>Cancel</button>}
+            <button className="button-primary submit-button" type="submit" disabled={loading}>
+              {loading ? <><span className="spinner" /> {editing ? "Saving changes" : "Sending request"}</> : <>{editing ? "Save changes" : "Compare my options"} <Icon name="arrow" size={15} /></>}
+            </button>
+          </div>
         </div>
       </form>
     </div>

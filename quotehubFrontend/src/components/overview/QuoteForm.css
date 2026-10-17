@@ -32,6 +32,7 @@
 .remove-file:hover { color: var(--red); background: #ff868614; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .form-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 15px; padding-top: 13px; border-top: 1px solid #252934; }
+.form-actions { display: flex; align-items: center; gap: 8px; }
 .privacy-note { display: flex; align-items: center; gap: 6px; color: #777e8b; font-size: 8px; }
 .privacy-note svg { color: #87cfb4; }
 .submit-button { min-height: 34px; padding: 0 12px; font-size: 9px; }
@@ -45,5 +46,6 @@
   .field { font-size: 9px; }
   .field select, .field input { font-size: 10px; }
   .form-footer { align-items: flex-start; flex-direction: column; }
+  .form-actions { width: 100%; }
   .submit-button { width: 100%; }
 }

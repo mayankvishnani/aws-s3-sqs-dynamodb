@@ -9,13 +9,16 @@ export function QuoteDetails({
   summary,
   refreshing,
   onRefresh,
+  onEdit,
 }: {
   quote: Quote;
   summary?: QuoteSummary;
   refreshing: boolean;
   onRefresh: () => void;
+  onEdit: () => void;
 }) {
   const business = quote.input?.businessName ?? summary?.businessName ?? "Business quote";
+  const editable = quote.status === "COMPLETED" || quote.status === "FAILED";
   return (
     <div className="panel details-panel">
       <div className="details-header"><div><span className="section-kicker">QUOTE DETAILS</span><button className="icon-button" onClick={onRefresh} aria-label="Refresh quote status"><Icon name="refresh" size={16} /></button></div><StatusBadge status={quote.status} /></div>
@@ -25,6 +28,7 @@ export function QuoteDetails({
         <span><small>ANNUAL REVENUE</small><b>{money(quote.input.annualRevenue)}</b></span>
         <span><small>STATE</small><b>{quote.input.state}</b></span>
       </div>}
+      {editable && quote.input && <button className="button-secondary edit-quote-button" onClick={onEdit}><Icon name="edit" size={14} /> Edit quote details</button>}
       <div className="quote-id-box"><span>QUOTE ID</span><code>{quote.quoteId}</code></div>
       {quote.documentUrl && <a className="document-link" href={quote.documentUrl} target="_blank" rel="noreferrer"><Icon name="file" size={15} /> View attached document <Icon name="external" size={13} /></a>}
       <div className="carrier-heading"><b>Carrier options</b><span>{quote.results.length} received</span></div>

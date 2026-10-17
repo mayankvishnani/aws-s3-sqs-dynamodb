@@ -1,4 +1,8 @@
 .details-panel { padding: 15px; }
+.edit-quote-button { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; }
+.button-secondary { min-height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 12px; border: 1px solid #383e4b; border-radius: 6px; color: #c3c8d3; background: #171b24; cursor: pointer; font-size: 9px; font-weight: 600; transition: .18s ease; }
+.button-secondary:hover:not(:disabled) { border-color: #687183; color: #fff; background: #202530; }
+.button-secondary:disabled { opacity: .65; cursor: wait; }
 .details-header { display: flex; align-items: center; justify-content: space-between; }
 .details-header > div { display: flex; align-items: center; gap: 8px; }
 .icon-button { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 1px solid #30343f; border-radius: 5px; color: #9ca2ae; background: transparent; cursor: pointer; }

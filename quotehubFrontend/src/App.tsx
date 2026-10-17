@@ -59,6 +59,8 @@ function App() {
           summary={quoteHub.selectedSummary}
           refreshing={quoteHub.refreshing}
           onRefresh={quoteHub.refreshSelectedQuote}
+          updating={quoteHub.updatingQuote}
+          onUpdateQuote={quoteHub.editQuote}
           onClose={quoteHub.closeQuote}
         />
       )}
