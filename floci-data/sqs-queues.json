@@ -1,0 +1,33 @@
+{
+  "000000000000/us-east-1::/000000000000/quote-requests-dlq" : {
+    "queueName" : "quote-requests-dlq",
+    "queueUrl" : "http://localhost:4566/000000000000/quote-requests-dlq",
+    "accountId" : "000000000000",
+    "attributes" : {
+      "ReceiveMessageWaitTimeSeconds" : "0",
+      "DelaySeconds" : "0",
+      "MessageRetentionPeriod" : "345600",
+      "MaximumMessageSize" : "1048576",
+      "VisibilityTimeout" : "30"
+    },
+    "tags" : { },
+    "createdTimestamp" : "2026-10-17T17:22:24.838828231Z",
+    "lastModifiedTimestamp" : "2026-10-17T17:22:24.838830531Z"
+  },
+  "000000000000/us-east-1::/000000000000/quote-requests" : {
+    "queueName" : "quote-requests",
+    "queueUrl" : "http://localhost:4566/000000000000/quote-requests",
+    "accountId" : "000000000000",
+    "attributes" : {
+      "ReceiveMessageWaitTimeSeconds" : "20",
+      "VisibilityTimeout" : "30",
+      "DelaySeconds" : "0",
+      "RedrivePolicy" : "{\"deadLetterTargetArn\":\"arn:aws:sqs:us-east-1:000000000000:quote-requests-dlq\",\"maxReceiveCount\":3}",
+      "MessageRetentionPeriod" : "345600",
+      "MaximumMessageSize" : "1048576"
+    },
+    "tags" : { },
+    "createdTimestamp" : "2026-10-17T17:22:24.866966646Z",
+    "lastModifiedTimestamp" : "2026-10-17T17:22:24.866967146Z"
+  }
+}

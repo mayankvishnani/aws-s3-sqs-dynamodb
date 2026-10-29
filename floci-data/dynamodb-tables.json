@@ -1,0 +1,54 @@
+{
+  "000000000000/us-east-1::QuoteHub" : {
+    "tableName" : "QuoteHub",
+    "keySchema" : [ {
+      "attributeName" : "pk",
+      "keyType" : "HASH"
+    }, {
+      "attributeName" : "sk",
+      "keyType" : "RANGE"
+    } ],
+    "attributeDefinitions" : [ {
+      "attributeName" : "pk",
+      "attributeType" : "S"
+    }, {
+      "attributeName" : "sk",
+      "attributeType" : "S"
+    } ],
+    "tableStatus" : "ACTIVE",
+    "creationDateTime" : "2026-10-17T17:22:24.780133017Z",
+    "itemCount" : 0,
+    "tableSizeBytes" : 0,
+    "provisionedThroughput" : {
+      "readCapacityUnits" : 0,
+      "writeCapacityUnits" : 0,
+      "lastIncreaseDateTime" : null,
+      "lastDecreaseDateTime" : null,
+      "numberOfDecreasesToday" : 0
+    },
+    "tableArn" : "arn:aws:dynamodb:us-east-1:000000000000:table/QuoteHub",
+    "tags" : { },
+    "globalSecondaryIndexes" : [ ],
+    "localSecondaryIndexes" : [ ],
+    "billingMode" : "PAY_PER_REQUEST",
+    "ttlAttributeName" : null,
+    "ttlEnabled" : false,
+    "pointInTimeRecoveryEnabled" : false,
+    "pointInTimeRecoveryRecoveryPeriodInDays" : 35,
+    "deletionProtectionEnabled" : false,
+    "streamEnabled" : false,
+    "streamArn" : null,
+    "streamViewType" : null,
+    "sseEnabled" : false,
+    "sseType" : null,
+    "kmsMasterKeyArn" : null,
+    "kinesisStreamingDestinations" : [ ],
+    "tableId" : "2fb0ab06-781a-4c17-abd4-b4267f9fc528",
+    "tableClass" : null,
+    "onDemandMaxReadRequestUnits" : null,
+    "onDemandMaxWriteRequestUnits" : null,
+    "replicaRegions" : [ ],
+    "resourcePolicy" : null,
+    "resourcePolicyRevisionId" : null
+  }
+}

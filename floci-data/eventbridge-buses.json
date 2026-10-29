@@ -1,0 +1,13 @@
+{
+  "000000000000/bus:us-east-1:default" : {
+    "name" : "default",
+    "arn" : "arn:aws:events:us-east-1:000000000000:event-bus/default",
+    "description" : null,
+    "tags" : { },
+    "createdTime" : "2026-10-18T11:02:08.385112137Z",
+    "policy" : null,
+    "kmsKeyIdentifier" : null,
+    "deadLetterConfig" : null,
+    "logConfig" : null
+  }
+}

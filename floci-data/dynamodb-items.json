@@ -1,0 +1,57 @@
+{
+  "000000000000/us-east-1::QuoteHub" : {
+    "QUOTE#9d8f9fe8-7d0d-4928-8913-bf9efd1e049a#META" : {
+      "pk" : {
+        "S" : "QUOTE#9d8f9fe8-7d0d-4928-8913-bf9efd1e049a"
+      },
+      "sk" : {
+        "S" : "META"
+      },
+      "status" : {
+        "S" : "COMPLETED"
+      },
+      "input" : {
+        "M" : {
+          "businessName" : {
+            "S" : "Acme Manufacturing Test Edit"
+          },
+          "industry" : {
+            "S" : "manufacturing"
+          },
+          "annualRevenue" : {
+            "N" : "2600000"
+          },
+          "state" : {
+            "S" : "CA"
+          }
+        }
+      },
+      "createdAt" : {
+        "S" : "2026-10-17T17:23:04.141Z"
+      },
+      "updatedAt" : {
+        "S" : "2026-10-17T17:24:05.016Z"
+      }
+    },
+    "QUOTE#9d8f9fe8-7d0d-4928-8913-bf9efd1e049a#RESULT#Globex Corporation" : {
+      "pk" : {
+        "S" : "QUOTE#9d8f9fe8-7d0d-4928-8913-bf9efd1e049a"
+      },
+      "sk" : {
+        "S" : "RESULT#Globex Corporation"
+      },
+      "carrier" : {
+        "S" : "Globex Corporation"
+      },
+      "premium" : {
+        "N" : "7800"
+      },
+      "currency" : {
+        "S" : "USD"
+      },
+      "coverageLimit" : {
+        "N" : "1000000"
+      }
+    }
+  }
+}
