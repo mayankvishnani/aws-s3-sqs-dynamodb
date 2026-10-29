@@ -219,3 +219,20 @@ npx tsx src/scripts/try-s3.ts
 ```
 
 The `try-db` and `try-s3` scripts are standalone learning checks; the API/worker flow requires the local AWS resources and both processes to be running.
+
+## GitHub Actions learning path
+
+The starter workflow at `.github/workflows/ci.yml` runs backend type-checking and tests when a backend test script is configured, plus a frontend production build. If no backend test script exists yet, the workflow reports a notice and skips that step. It runs for pushes, pull requests, and manual runs; these checks do not need AWS credentials or a running Floci instance.
+
+Try these exercises in order:
+
+1. **Follow a workflow run:** push a small change or open a pull request. In GitHub, open **Actions**, select the CI run, and inspect its jobs, steps, logs, and check status.
+2. **Trigger a failure intentionally:** on a short-lived branch, temporarily make a test fail, push it, and find the failure in the log. Revert the test change and confirm the next run passes.
+3. **Add a quality check:** add a lint or formatting script to one package, run it locally, then add that command as a CI step. CI should use the same command developers use.
+4. **Learn matrices:** run the backend checks against more than one supported Node.js version using a job matrix. Decide which version is the required check and which are compatibility checks.
+5. **Publish an artifact:** upload `quotehubFrontend/dist` from a successful build, then download it from the workflow run. Artifacts are useful for inspecting or handing off build output; they are not a deployment by themselves.
+6. **Add integration testing:** run Floci as a service in a workflow, wait for its health check, create the resources, and exercise the API/worker flow. Keep this separate from the fast unit-test job.
+7. **Protect the main branch:** configure the passing CI job as a required status check in GitHub branch protection or a ruleset, then verify a pull request cannot merge while checks fail.
+8. **Plan deployment:** choose a hosting target and decide which branches/tags may deploy before adding a deployment job. For AWS, prefer GitHub OIDC with a narrowly scoped IAM role over long-lived AWS access keys; store any required values in GitHub environment secrets and require approval for production.
+
+The project is currently configured for local development with Floci and does not provision production AWS infrastructure or specify a hosting target. Complete the deployment design before adding a CD job so CI does not accidentally deploy to an unintended environment.
