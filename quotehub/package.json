@@ -7,7 +7,8 @@
     "setup": "tsx src/infrastructure/aws/setup.ts",
     "api": "tsx src/api/server.ts",
     "worker": "tsx src/workers/quote-worker.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test"
   },
   "keywords": [],
   "author": "",
